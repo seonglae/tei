@@ -1,11 +1,14 @@
 [project]
 name = "tei"
-version = "0.1.0"
-description = "Add your description here"
+version = "0.3.0"
+description = "Text Embeddings Inference (TEI)'s unofficial python wrapper library for batch processing with asyncio"
 authors = [
     { name = "seonglae", email = "sungle3737@gmail.com" }
 ]
-dependencies = []
+dependencies = [
+    "requests>=2.31.0",
+    "aiohttp>=3.8.6",
+]
 readme = "README.md"
 requires-python = ">= 3.8"
 
@@ -15,7 +18,10 @@ build-backend = "hatchling.build"
 
 [tool.rye]
 managed = true
-dev-dependencies = []
+dev-dependencies = [
+    "autopep8>=2.0.4",
+    "mypy>=1.6.1",
+]
 
 [tool.hatch.metadata]
 allow-direct-references = true
