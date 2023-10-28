@@ -1,6 +1,6 @@
 [project]
 name = "teicli"
-version = "0.3.0-alpha.0"
+version = "0.3.1"
 description = "Text Embeddings Inference (TEI)'s unofficial python wrapper library for batch processing with asyncio"
 authors = [
     { name = "seonglae", email = "sungle3737@gmail.com" }
@@ -10,7 +10,7 @@ dependencies = [
     "aiohttp>=3.8.6",
 ]
 readme = "README.md"
-requires-python = ">= 3.8"
+requires-python = ">= 3.8.0"
 
 [build-system]
 requires = ["hatchling"]
