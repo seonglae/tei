@@ -1,6 +1,12 @@
-# TEI
+# TEI Python
 
 Text Embeddings Inference (TEI)'s unofficial python wrapper library for batch processing with asyncio.
+
+# Get Started
+
+```sh
+pip install teicli
+```
 
 ```py
 from tei import TEIClient
