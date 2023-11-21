@@ -1,6 +1,6 @@
 [project]
 name = "teicli"
-version = "0.3.1"
+version = "0.3.2"
 description = "Text Embeddings Inference (TEI)'s unofficial python wrapper library for batch processing with asyncio"
 authors = [
     { name = "seonglae", email = "sungle3737@gmail.com" }

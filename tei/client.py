@@ -1,5 +1,6 @@
 import json
 import asyncio
+from typing import Union
 
 from typing import List
 
@@ -56,7 +57,7 @@ class TEIClient:
     self._check_embed_errors(response)
     return response.json()[0]
 
-  def _check_embed_errors(self, response: requests.Response | aiohttp.ClientResponse) -> None:
+  def _check_embed_errors(self, response: Union[requests.Response, aiohttp.ClientResponse]) -> None:
     status = response.status_code if isinstance(
         response, requests.Response) else response.status
     if status != 200:
