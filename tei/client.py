@@ -1,34 +1,39 @@
 import json
 import asyncio
-from typing import Union
+from typing import Union, Optional, Any
 
 from typing import List
 
-from aiohttp import ClientResponse
+from aiohttp import ClientResponse, ClientResponseError
 import requests
 import aiohttp
 
 
 class TEIClient:
-  def __init__(self, host: str = 'localhost', port: int = 3000, protocol: str = 'http') -> List[float]:
+  def __init__(self, host: str = 'localhost', port: int = 3000, protocol: str = 'http') -> None:
     self.host = host
     self.port = port
     self.base_url = f"{protocol}://{self.host}:{self.port}"
     self.health()
 
-  async def embed(self, text: str, session: aiohttp.ClientSession = None) -> List[float]:
+  async def embed(self, text: str, session: Optional[aiohttp.ClientSession] = None, retry=10) -> List[float]:
     headers = {"Content-Type": "application/json"}
     data = {"inputs": text}
 
-    if session is None:
-      async with aiohttp.ClientSession(self.base_url) as s:
-        async with s.post("/embed", headers=headers, data=json.dumps(data)) as response:
-          self._check_embed_errors(response)
-          return (await response.json())[0]
-    else:
-      async with session.post("/embed", headers=headers, data=json.dumps(data)) as response:
-        self._check_embed_errors(response)
-        return (await response.json())[0]
+    while retry > 0:
+      try:
+        if session is None:
+          async with aiohttp.ClientSession(self.base_url) as s:
+            async with s.post("/embed", headers=headers, data=json.dumps(data)) as response:
+              self._check_embed_errors(response)
+              return (await response.json())[0]
+        else:
+          async with session.post("/embed", headers=headers, data=json.dumps(data)) as response:
+            self._check_embed_errors(response)
+            return (await response.json())[0]
+      except ClientResponseError as _:
+        retry -= 1
+    raise ClientResponseError('Retry limit exceeded', None)
 
   async def embed_batch(self, texts: List[str]) -> List[List[float]]:
     async with aiohttp.ClientSession(self.base_url) as s:
@@ -36,7 +41,7 @@ class TEIClient:
       return embeddings
 
   def health(self) -> bool:
-    response = requests.get(f"{self.base_url}/health")
+    response = requests.get(f"{self.base_url}/health", timeout=10)
     response.raise_for_status()
     return True
 
@@ -53,7 +58,7 @@ class TEIClient:
     headers = {"Content-Type": "application/json"}
     data = {"inputs": text}
     response = requests.post(
-        f"{self.base_url}/embed", headers=headers, data=json.dumps(data))
+        f"{self.base_url}/embed", headers=headers, data=json.dumps(data), timeout=10)
     self._check_embed_errors(response)
     return response.json()[0]
 
@@ -62,7 +67,7 @@ class TEIClient:
         response, requests.Response) else response.status
     if status != 200:
       try:
-        error = response.json()
+        error: Any = response.json()
         raise RuntimeError(f"{error['error']} ({error['error_type']})")
       except Exception as e:
         if status == 413:
@@ -76,11 +81,11 @@ class TEIClient:
         response.raise_for_status()
 
   def info(self) -> dict:
-    response = requests.get(f"{self.base_url}/info")
+    response = requests.get(f"{self.base_url}/info", timeout=10)
     response.raise_for_status()
     return response.json()
 
   def metrics(self) -> dict:
-    response = requests.get(f"{self.base_url}/metrics")
+    response = requests.get(f"{self.base_url}/metrics", timeout=10)
     response.raise_for_status()
     return response.text
